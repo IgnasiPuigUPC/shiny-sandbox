@@ -101,7 +101,7 @@ server <- function(input, output, session) {
             collapse = '\n')
       }
       
-      dir.create(dirToSave, 'dir1')
+      dir.create(dirToSave)
       
       #fill and save file1
       fileName1 <- paste(input$file1, '.txt', sep ='')
@@ -114,11 +114,11 @@ server <- function(input, output, session) {
       fileConn <- file(file.path(tempdir(), fileName2))
       writeLines(input$file2Content, fileConn)
       close(fileConn)
-      
+
       #create zip file
 
       zip(zipfile = file, 
-          files = c(file.path(fileName2), file.path('dir1',fileName1)))
+          files = c(file.path(tempdir(), fileName2), file.path(tempdir(), 'dir1',fileName1)))
 
     }
   )
