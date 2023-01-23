@@ -116,11 +116,10 @@ server <- function(input, output, session) {
       close(fileConn)
       
       #create zip file
-      lastWd <- getwd()
-      setwd(tempdir())
+
       zip(zipfile = file, 
           files = c(file.path(fileName2), file.path('dir1',fileName1)))
-      setwd(lastWd)
+
     }
   )
   
