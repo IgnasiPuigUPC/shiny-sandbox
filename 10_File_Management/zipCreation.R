@@ -116,6 +116,16 @@ server <- function(input, output, session) {
       close(fileConn)
 
       #create zip file
+      
+      if (dir.exists('dir1')) {
+        
+        unlink('dir1', recursive = T)
+        dir.create('dir1')
+        
+      }
+      
+      file.rename(from = file.path(dirToSave, fileName1), to = file.path('dir1',fileName1))
+      file.rename(from = file.path(tempdir(), fileName2), to = fileName2)
 
       zip(zipfile = file, 
           files = c(file.path(tempdir(), fileName2), file.path(tempdir(), 'dir1',fileName1)))
