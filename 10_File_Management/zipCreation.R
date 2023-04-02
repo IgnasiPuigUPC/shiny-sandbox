@@ -101,7 +101,7 @@ server <- function(input, output, session) {
             collapse = '\n')
       }
       
-      dir.create(dirToSave, 'dir1')
+      dir.create(dirToSave)
       
       #fill and save file1
       fileName1 <- paste(input$file1, '.txt', sep ='')
@@ -114,13 +114,22 @@ server <- function(input, output, session) {
       fileConn <- file(file.path(tempdir(), fileName2))
       writeLines(input$file2Content, fileConn)
       close(fileConn)
-      
+
       #create zip file
-      lastWd <- getwd()
-      setwd(tempdir())
+      
+      if (dir.exists('dir1')) {
+        
+        unlink('dir1', recursive = T)
+        dir.create('dir1')
+        
+      }
+      
+      file.rename(from = file.path(dirToSave, fileName1), to = file.path('dir1',fileName1))
+      file.rename(from = file.path(tempdir(), fileName2), to = fileName2)
+
       zip(zipfile = file, 
-          files = c(file.path(fileName2), file.path('dir1',fileName1)))
-      setwd(lastWd)
+          files = c(file.path(tempdir(), fileName2), file.path(tempdir(), 'dir1',fileName1)))
+
     }
   )
   
