@@ -75,7 +75,7 @@ server <- function(input, output) {
         
         lapply(1:input$select, function(i) {
             renderUI(
-                textInput(inputId = paste0('unit',i),
+                passwordInput(inputId = paste0('unit',i),
                           label = paste('units',i, sep =' '))
             )
         })
