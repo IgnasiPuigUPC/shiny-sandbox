@@ -5,4 +5,5 @@
 *.dcf
 *.Rproj
 *.Rproj.user
+*.tsv
 .Rproj.user
