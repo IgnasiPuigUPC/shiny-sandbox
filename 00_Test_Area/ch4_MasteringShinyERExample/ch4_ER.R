@@ -26,8 +26,15 @@ topSumm <- function(data2cut, numGrup = 5) {
 
 ui <- fluidPage(
   
-  fluidRow(column(width = 4,
-                  selectInput('product','Product', choices = prodCodes))),
+  fluidRow(column(width = 8,
+                  selectInput('product','Product', 
+                              choices = prodCodes,
+                              width = '100%')),
+           column(width = 4,
+                  selectInput('yAxis','Graph Type', 
+                              choices = setNames(object = c('absolute','relative'),
+                                                 nm = c('Count of events','Frequency of events')),
+                              selected = 'relative'))),
   
   fluidRow(column(width = 4,
                   tableOutput('loc')),
@@ -38,7 +45,16 @@ ui <- fluidPage(
   
   fluidRow(column(width = 8,
                   offset = 2,
-                  plotOutput('plotNorm')))
+                  plotOutput('plotNorm'))),
+  
+  h4('Narrative browser'),
+  
+  fluidRow(column(width = 2,
+                  actionButton('forward','Forward', width = '100%'),
+                  actionButton('backward','Backward', width = '100%')),
+           column(width = 10,
+                  textOutput('counter'),
+                  textOutput('story')))
   
 )
 
@@ -56,15 +72,42 @@ server <- function(input, output, session) {
                              align = NULL,
                              width = '100%')
   
-  summary <- reactive({selected() %>% 
-                      count(age, sex, wt = weight) %>%
-                      left_join(population, by = c("age", "sex")) %>% 
-                      mutate(rate = n / population * 1e4)})
-  output$plotNorm <- renderPlot({summary() %>% 
-                                ggplot(aes(age, rate, colour = sex)) + 
-                                geom_line(na.rm = TRUE) + 
-                                labs(y = "Injuries per 10,000 people")},
+  summary <- reactive({if (input$yAxis == 'absolute') {
+                           return(list(toPlot = selected() %>% count(age, sex, wt = weight, name = 'rate'),
+                                       title = 'Count of events',
+                                       yLegend = 'counts'))
+                       } else {
+                           return(list(toPlot = selected() %>% 
+                                                  count(age, sex, wt = weight) %>%
+                                                  left_join(population, by = c("age", "sex")) %>% 
+                                                  mutate(rate = n / population * 1e4),
+                                       title = 'Frequency of events',
+                                       yLegend = 'Injuries per 10,000 people'))
+                       }
+                    })
+    
+  output$plotNorm <- renderPlot({summary()$toPlot %>%
+                                 ggplot(aes(age, rate, colour = sex)) +
+                                 geom_line(na.rm = TRUE) +
+                                 labs(title = summary()[[2]],
+                                      y = summary()$yLegend)},
                                 res = 96)
+  
+  counter <- reactiveVal(value = 1)
+  observeEvent(eventExpr = input$product,
+               handlerExpr = {counter(1)})
+  observeEvent(eventExpr = input$forward,
+               handlerExpr = {if (counter() == (nrow(selected())))
+                                counter(1)
+                              else
+                                counter(counter() + 1)})
+  observeEvent(eventExpr = input$backward,
+               handlerExpr = {if (counter() == 1)
+                                counter(nrow(selected()))
+                              else
+                                counter(counter() - 1)})
+  output$counter <- renderText(counter())
+  output$story <- renderText(selected()$narrative[counter()])
   
 }
 
