@@ -119,32 +119,6 @@ server <- function(input, output, session) {
 
       #create zip file
       
-      if (dir.exists('dir1')) {
-        
-        unlink('dir1', recursive = T)
-        
-      }
-      
-      dir.create('dir1')
-      
-      # file.rename(from = file.path(dirToSave, fileName1), to = file.path('dir1',fileName1))
-      # file.rename(from = file.path(tempdir(), fileName2), to = fileName2)
-
-      # zip::zip(zipfile = file, 
-      #          files = c(file.path(tempdir(), fileName2), file.path(tempdir(), 'dir1',fileName1)),
-      #          mode = 'mirror',
-      #          include_directories = TRUE,
-      #          recurse = TRUE)
-      
-      # lwd <- getwd()
-      # setwd(tempdir())
-      
-      # zip::zip(zipfile = file, 
-      #          files = c( file.path(tempdir(), 'dir1',fileName1)),
-      #          mode = 'cherry-pick',
-      #          include_directories = TRUE,
-      #          recurse = TRUE)
-      
       # root = tempdir() indicates where the zip creation function points as the zip root directory
       # mode = 'mirror' indicates that files need to keep their directory structure in the zip file
       #        'cherry-pick' places all files at the same level regardless their actual location
